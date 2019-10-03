@@ -33,7 +33,7 @@ class SnackbarWrapper extends Component {
     }
 
     render() {
-        const {message, variant, show, handleClose} = this.props;
+        const {message, variant, handleClose} = this.props;
         const Icon = variantIcon[variant];
 
         let snackbarClosed = (!this.state.showSnackbar) ? 'snackbar-closed' : '';

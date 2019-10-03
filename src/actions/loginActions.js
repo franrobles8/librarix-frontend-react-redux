@@ -2,33 +2,49 @@ import {
     LOADING,
     SUCCESS,
     ERROR,
-    ERROR_DISMISS
+    ERROR_DISMISS,
+    SUCCESS_LOGOUT
 } from '../constants/loginConstants';
 
-export const login = () => {
+import setAuthToken from '../utils/setAuthToken';
+
+import * as API from '../services/loginService';
+
+export const login = (username, password) => {
 
     return (dispatch) => {
-        dispatch(loginLoading());
+        dispatch(loginLoading(true));
 
-        //Login action service
-        const user = {
-            email: "test@test.com",
-            token: "1S23jkjashfs"
-        };
-        //setTimeout(()=>{dispatch(loginSuccessful(user));}, 2000);
-        setTimeout(()=>{dispatch(loginError());}, 2000);
-        setTimeout(()=>{dispatch(loginSuccessful(user));}, 2000);
-
+        try {
+            const response = API.authenticate(username, password);
+            response.then((res) => {
+                setAuthToken({username: res.data.username, token: res.data.token});
+                dispatch(loginSuccessful({username: res.data.username, token: res.data.token}));
+                dispatch(loginLoading(false));
+            }).catch((error) => {
+                console.log(error.message);
+                dispatch(loginLoading(false));
+                dispatch(loginError());
+            });
+        } catch(error) {
+            console.log(error.message);
+            dispatch(loginLoading(false));
+        }
     }
-
-
-
 }
 
-const loginLoading = () => {
+export const logout = () => {
+    return (dispatch) => {
+        // if there isn't any parameter, it will remove the token from headers
+        setAuthToken();
+        dispatch(logoutSucessful());
+    }
+}
+
+const loginLoading = (isLoading) => {
     return {
         type: LOADING,
-        loading: true
+        loading: isLoading
     };
 }
 
@@ -38,6 +54,13 @@ const loginSuccessful = (user) => {
         loading: false,
         errorLogin: false,
         user: user
+    };
+}
+
+const logoutSucessful = () => {
+    return {
+        type: SUCCESS_LOGOUT,
+        user: {}
     };
 }
 

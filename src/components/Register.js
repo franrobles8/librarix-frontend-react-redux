@@ -1,8 +1,7 @@
 import { connect } from 'react-redux';
 import React, { Component } from 'react';
+import { register, setErrorRegisterFalse } from '../actions/registerActions';
 import { Link as LinkRouter, Redirect } from 'react-router-dom';
-import { login, setErrorLoginFalse } from '../actions/loginActions';
-import { setRedirectLogin, removeRegisteredUserInfo } from '../actions/registerActions';
 
 import SnackbarWrapper from '../components/SnackbarWrapper';
 
@@ -11,27 +10,25 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-class Login extends Component {
+class Register extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            username: '',
-            password: '',
-            rememberUser: false
+            username: "",
+            password: "",
+            password2: "",
+            firstName: "",
+            lastName: "",
+            passwordMissmatch: false,
+            timerToLogin: null
         };
-    }
-
-    componentDidMount() {
-        this.props.setRedirectLogin(false);
     }
 
     handleUsernameChange = (event) => {
@@ -42,35 +39,34 @@ class Login extends Component {
         this.setState({password: event.target.value});
     }
 
-    handleRemember = (event) => {
-        this.setState({rememberUser: event.target.value});
-    }
-
-    doLogin = () => {
-        let {username, password, rememberUser} = this.state;
-        this.props.login(username, password, rememberUser);
-    }
-
-    static getDerivedStateFromProps(nextProps, prevState) {
-        if (nextProps.userFromRegister) {
-            const usernameReg = nextProps.userFromRegister.username;
-            const passwordReg = nextProps.userFromRegister.password;
-
-            nextProps.removeRegisteredUserInfo();
-
-            return ({
-                username: usernameReg,
-                password: passwordReg
-            });
+    handlePassword2Change = (event) => {
+        if(event.target.value !== this.state.password) {
+            this.setState({passwordMissmatch: true});
+        } else {
+            this.setState({passwordMissmatch: false});
         }
-        return null;
+        this.setState({password2: event.target.value});
+    }
+
+    handleFirstNameChange = (event) => {
+        this.setState({firstName: event.target.value});
+    }
+
+    handleLastNameChange = (event) => {
+        this.setState({lastName: event.target.value});
+    }
+
+    doRegister = () => {
+        let {username, password, firstName, lastName} = this.state;
+
+        this.props.register({username, password, firstName, lastName});
     }
 
     render() {
-        let {loading, errorLogin, setErrorLoginFalse, user} = this.props;
+        let {loading, errorRegister, setErrorRegisterFalse, redirectLogin, registeredSuccessfully} = this.props;
 
-        if(user.token) {
-            return <Redirect to={'/'} />;
+        if(redirectLogin) {
+            return <Redirect to='/login'/>;
         }
 
         return (
@@ -84,10 +80,10 @@ class Login extends Component {
                 <CssBaseline/>
                 <Container component='main' maxWidth='xs' className='login-container'>
                     <Avatar className='avatar'>
-                        <LockOutlinedIcon />
+                        <PersonAddIcon />
                     </Avatar>
                     <Typography component="h1" variant="h5" className='text-login-title'>
-                        Sign in
+                        Register
                     </Typography>
                     <form className='form' noValidate>
                         <TextField
@@ -100,7 +96,6 @@ class Login extends Component {
                             name="username"
                             autoComplete="username"
                             onChange={this.handleUsernameChange}
-                            value={this.state.username || ''}
                             autoFocus
                         />
                         <TextField
@@ -114,12 +109,44 @@ class Login extends Component {
                             id="password"
                             autoComplete="current-password"
                             onChange={this.handlePasswordChange}
-                            value={this.state.password || ''}
                         />
-                        <FormControlLabel
-                            control={<Checkbox value="remember" color="primary" onChange={this.handleRemember} />}
-                            label="Remember me"
+                        <TextField
+                            variant="outlined"
+                            margin="normal"
+                            required
+                            fullWidth
+                            name="password2"
+                            label="Repeat password"
+                            type="password"
+                            id="password2"
+                            autoComplete="current-password"
+                            onChange={this.handlePassword2Change}
+                            error={this.state.passwordMissmatch}
+                            helperText={this.state.passwordMissmatch ? 'Passwords must be the same!' : ''}
                         />
+                        <TextField
+                            variant="outlined"
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="firstName"
+                            label="Firstname"
+                            name="firstName"
+                            autoComplete="firstname"
+                            onChange={this.handleFirstNameChange}
+                        />
+                        <TextField
+                            variant="outlined"
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="lastName"
+                            label="Lastname"
+                            name="lastName"
+                            autoComplete="lastname"
+                            onChange={this.handleLastNameChange}
+                        />
+
                         <div className="wrapper-button-login">
                             <Button
                                 type="button"
@@ -128,17 +155,17 @@ class Login extends Component {
                                 color="primary"
                                 className='submit'
                                 disabled={loading}
-                                onClick={this.doLogin}
+                                onClick={this.doRegister}
                             >
-                                Sign In
+                                Register
                             </Button>
                             {loading && <CircularProgress size={24} className='buttonProgress' />}
                             <SnackbarWrapper
-                                variant="error"
+                                variant={errorRegister ? 'error' : 'success'}
                                 className=''
-                                message="Wrong email and/or password!"
-                                show={errorLogin}
-                                handleClose={setErrorLoginFalse}
+                                message={errorRegister ? "Username already exists!" : "Registered successfully!"}
+                                show={errorRegister || registeredSuccessfully}
+                                handleClose={setErrorRegisterFalse}
 
                             />
                         </div>
@@ -147,9 +174,9 @@ class Login extends Component {
 
                             </Grid>
                             <Grid item>
-                                <LinkRouter to={'/register'}>
+                                <LinkRouter to={'/login'}>
                                     <span>
-                                        {"Don't have an account? Sign Up"}
+                                        {"I already have an account"}
                                     </span>
                                 </LinkRouter>
                             </Grid>
@@ -163,21 +190,19 @@ class Login extends Component {
 
 const mapStateToProps = (state /*, ownProps*/) => {
     return {
-        loading: state.login.loading,
-        user: state.login.user,
-        errorLogin: state.login.errorLogin,
-        userFromRegister: state.register.user
+        loading: state.register.loading,
+        errorRegister: state.register.errorRegister,
+        redirectLogin: state.register.redirectLogin,
+        registeredSuccessfully: state.register.registeredSuccessfully
     }
 };
 
 const mapDispatchToProps = {
-    login,
-    setErrorLoginFalse,
-    setRedirectLogin,
-    removeRegisteredUserInfo
+    register,
+    setErrorRegisterFalse
 };
 
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(Login)
+)(Register)

@@ -2,12 +2,13 @@ import {
     LOADING,
     SUCCESS,
     ERROR,
-    ERROR_DISMISS
+    ERROR_DISMISS,
+    SUCCESS_LOGOUT
 } from '../constants/loginConstants';
 
 const initialState = {
     loading: false,
-    user: false,
+    user: JSON.parse(localStorage.getItem('user')) || {},
     errorLogin: false
 };
 
@@ -20,6 +21,7 @@ export default function login(state = initialState, action = {}) {
                 loading: action.loading
             };
         case SUCCESS:
+            localStorage.setItem('user', JSON.stringify(action.user));
             return {
                 ...state,
                 loading: action.loading,
@@ -36,6 +38,12 @@ export default function login(state = initialState, action = {}) {
                 ...state,
                 errorLogin: action.errorLogin
             };
+        case SUCCESS_LOGOUT:
+            localStorage.clear();
+            return {
+                ...state,
+                user: action.user
+            }
 
         default:
             return state;
