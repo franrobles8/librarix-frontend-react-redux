@@ -52,6 +52,7 @@ class Login extends Component {
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
+
         if (nextProps.userFromRegister) {
             const usernameReg = nextProps.userFromRegister.username;
             const passwordReg = nextProps.userFromRegister.password;
@@ -67,11 +68,12 @@ class Login extends Component {
     }
 
     render() {
-        let {loading, errorLogin, setErrorLoginFalse, user} = this.props;
+        let {loading, errorLogin, setErrorLoginFalse, isValidToken} = this.props;
 
-        if(user.token) {
-            return <Redirect to={'/'} />;
+        if(isValidToken) {
+            return <Redirect to='/' />;
         }
+
 
         return (
             <Grid
@@ -166,7 +168,8 @@ const mapStateToProps = (state /*, ownProps*/) => {
         loading: state.login.loading,
         user: state.login.user,
         errorLogin: state.login.errorLogin,
-        userFromRegister: state.register.user
+        userFromRegister: state.register.user,
+        isValidToken: state.login.isValidToken
     }
 };
 

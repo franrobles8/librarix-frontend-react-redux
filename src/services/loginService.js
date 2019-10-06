@@ -16,6 +16,20 @@ export function authenticate(username, password) {
     return result;
 }
 
+export function checkValidToken(token) {
+    const result = new Promise((resolve, reject) => {
+        axios.post(`${BASE_URL}/users/checkValidToken`, {
+            token
+        })
+            .then((res) => resolve(res))
+            .catch((err) => reject(err))
+    });
+
+    // result.then((res) => console.log(res)).catch(err => console.log(err.message));
+
+    return result;
+}
+
 
 // Delete this test function
 export function test(user) {

@@ -1,5 +1,6 @@
 import { connect } from 'react-redux';
 import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
 import { logout } from '../actions/loginActions';
 
 // Material-UI components
@@ -14,7 +15,12 @@ class Main extends Component {
     }
 
     render() {
-        const {user} = this.props;
+        const {user, isValidToken} = this.props;
+
+        if(!isValidToken) {
+            return <Redirect to='/login' />;
+        }
+
         return (
             <Grid
                 container
@@ -34,7 +40,8 @@ class Main extends Component {
 
 const mapStateToProps = (state /*, ownProps*/) => {
     return {
-        user: state.login.user
+        user: state.login.user,
+        isValidToken: state.login.isValidToken
     }
 };
 

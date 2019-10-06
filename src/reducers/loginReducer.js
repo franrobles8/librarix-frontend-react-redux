@@ -3,13 +3,15 @@ import {
     SUCCESS,
     ERROR,
     ERROR_DISMISS,
-    SUCCESS_LOGOUT
+    SUCCESS_LOGOUT,
+    SET_VALID_TOKEN
 } from '../constants/loginConstants';
 
 const initialState = {
     loading: false,
     user: JSON.parse(localStorage.getItem('user')) || {},
-    errorLogin: false
+    errorLogin: false,
+    isValidToken: false
 };
 
 export default function login(state = initialState, action = {}) {
@@ -25,7 +27,8 @@ export default function login(state = initialState, action = {}) {
             return {
                 ...state,
                 loading: action.loading,
-                user: action.user
+                user: action.user,
+                isValidToken: true
             };
         case ERROR:
             return {
@@ -42,7 +45,13 @@ export default function login(state = initialState, action = {}) {
             localStorage.clear();
             return {
                 ...state,
-                user: action.user
+                user: {},
+                isValidToken: false
+            };
+        case SET_VALID_TOKEN:
+            return {
+                ...state,
+                isValidToken: action.validToken
             }
 
         default:

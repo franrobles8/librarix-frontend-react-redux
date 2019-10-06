@@ -3,10 +3,11 @@ import {
     SUCCESS,
     ERROR,
     ERROR_DISMISS,
-    SUCCESS_LOGOUT
+    SUCCESS_LOGOUT,
+    SET_VALID_TOKEN
 } from '../constants/loginConstants';
 
-import setAuthToken from '../utils/setAuthToken';
+//import setAuthToken from '../utils/setAuthToken';
 
 import * as API from '../services/loginService';
 
@@ -18,7 +19,7 @@ export const login = (username, password) => {
         try {
             const response = API.authenticate(username, password);
             response.then((res) => {
-                setAuthToken({username: res.data.username, token: res.data.token});
+                //setAuthToken(res.data.token);
                 dispatch(loginSuccessful({username: res.data.username, token: res.data.token}));
                 dispatch(loginLoading(false));
             }).catch((error) => {
@@ -36,8 +37,30 @@ export const login = (username, password) => {
 export const logout = () => {
     return (dispatch) => {
         // if there isn't any parameter, it will remove the token from headers
-        setAuthToken();
+        //setAuthToken();
         dispatch(logoutSucessful());
+    }
+}
+
+export const checkValidToken = (token) => {
+    return (dispatch) => {
+        API.checkValidToken(token)
+            .then((res) => {
+                if(res.data.validToken) {
+                    dispatch(setValidToken(res.data.validToken));
+                } else {
+                    dispatch(setValidToken(false));
+                    console.log(res.data.message);
+                }
+            })
+            .catch(err => console.log(err));
+    }
+}
+
+const setValidToken = (validToken) => {
+    return {
+        type: SET_VALID_TOKEN,
+        validToken
     }
 }
 

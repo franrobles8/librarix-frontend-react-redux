@@ -63,7 +63,11 @@ class Register extends Component {
     }
 
     render() {
-        let {loading, errorRegister, setErrorRegisterFalse, redirectLogin, registeredSuccessfully} = this.props;
+        let {loading, errorRegister, setErrorRegisterFalse, redirectLogin, registeredSuccessfully, user} = this.props;
+
+        if(user.token) {
+            return <Redirect to='/'/>;
+        }
 
         if(redirectLogin) {
             return <Redirect to='/login'/>;
@@ -193,7 +197,8 @@ const mapStateToProps = (state /*, ownProps*/) => {
         loading: state.register.loading,
         errorRegister: state.register.errorRegister,
         redirectLogin: state.register.redirectLogin,
-        registeredSuccessfully: state.register.registeredSuccessfully
+        registeredSuccessfully: state.register.registeredSuccessfully,
+        user: state.login.user,
     }
 };
 
