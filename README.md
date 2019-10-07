@@ -19,4 +19,4 @@ Now, you will need to run the node server to see the application:
 It will automatically open a window in your default browser, but if it doesn't, try entering manually [http://localhost:3000](http://localhost:3000)
 
 ## To install the backend necessary to communicate with this frontend project, follow this documentation:
-[To do](#)
+[Backend documentation](https://github.com/franrobles8/librarix-backend-nodejs-express)
