@@ -1,5 +1,9 @@
 import axios from 'axios';
 
+import Cookies from 'universal-cookie';
+
+const cookies = new Cookies();
+
 const BASE_URL = 'http://localhost:4000';
 
 export function authenticate(username, password) {
@@ -17,9 +21,10 @@ export function authenticate(username, password) {
 }
 
 export function checkValidToken(token) {
+
     const result = new Promise((resolve, reject) => {
         axios.post(`${BASE_URL}/users/checkValidToken`, {
-            token
+            token: cookies.get('token')
         })
             .then((res) => resolve(res))
             .catch((err) => reject(err))

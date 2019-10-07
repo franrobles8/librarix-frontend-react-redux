@@ -7,9 +7,16 @@ import {
     SET_VALID_TOKEN
 } from '../constants/loginConstants';
 
+import Cookies from 'universal-cookie';
+
+const cookies = new Cookies();
+
 const initialState = {
     loading: false,
-    user: JSON.parse(localStorage.getItem('user')) || {},
+    user: {
+        username: cookies.get('username'),
+        token: cookies.get('token')
+        } || {},
     errorLogin: false,
     isValidToken: false
 };
@@ -23,7 +30,8 @@ export default function login(state = initialState, action = {}) {
                 loading: action.loading
             };
         case SUCCESS:
-            localStorage.setItem('user', JSON.stringify(action.user));
+            cookies.set('token', action.user.token, {path: '/', maxAge: action.user.maxAge});
+            cookies.set('username', action.user.username, {path: '/', maxAge: action.user.maxAge});
             return {
                 ...state,
                 loading: action.loading,
@@ -42,7 +50,8 @@ export default function login(state = initialState, action = {}) {
                 errorLogin: action.errorLogin
             };
         case SUCCESS_LOGOUT:
-            localStorage.clear();
+            cookies.remove('token');
+            cookies.remove('username');
             return {
                 ...state,
                 user: {},

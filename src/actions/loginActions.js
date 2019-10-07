@@ -11,7 +11,9 @@ import {
 
 import * as API from '../services/loginService';
 
-export const login = (username, password) => {
+
+export const login = (username, password, rememberUser) => {
+    console.log(rememberUser);
 
     return (dispatch) => {
         dispatch(loginLoading(true));
@@ -20,7 +22,8 @@ export const login = (username, password) => {
             const response = API.authenticate(username, password);
             response.then((res) => {
                 //setAuthToken(res.data.token);
-                dispatch(loginSuccessful({username: res.data.username, token: res.data.token}));
+                let maxAge = rememberUser ? 3600 * 24 * 30 : 3600; // 1 month or 1 hour if rememberUser not checked
+                dispatch(loginSuccessful({username: res.data.username, token: res.data.token, maxAge}));
                 dispatch(loginLoading(false));
             }).catch((error) => {
                 console.log(error.message);

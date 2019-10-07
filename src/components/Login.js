@@ -43,7 +43,7 @@ class Login extends Component {
     }
 
     handleRemember = (event) => {
-        this.setState({rememberUser: event.target.value});
+        this.setState({rememberUser: event.target.checked});
     }
 
     doLogin = () => {
